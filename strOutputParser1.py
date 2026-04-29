@@ -1,8 +1,8 @@
-# promp ->LLM -> text output(detailed) -> LLM -> 5 Line sumary
-#code withoput strOutputParser
+# same code now with the help of strOutputParser
 from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
 from dotenv import load_dotenv
 from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import StrOutputParser
 
 load_dotenv()
 
@@ -25,11 +25,8 @@ template2 = PromptTemplate(
     input_variables=['report']
 )
 
-prompt1 = template1.invoke({'topic': 'black holes'})
-result1 = model.invoke(prompt1)
+parser = StrOutputParser()
+chain = template1 | model | parser | template2 | model
 
-prompt2 = template2.invoke({'report': result1})
-result2 = model.invoke(prompt2)
-
-print(result1.content)
-print(result2.content)
+result = chain.invoke({'topic': 'black holes'})
+print(result.content)
